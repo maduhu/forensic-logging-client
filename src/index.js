@@ -11,20 +11,18 @@ class Sidecar {
     this._connectTimeout = settings.connectTimeout || 30000
     this._reconnectInterval = settings.reconnectInterval || 5000
 
-    this._service = null
     this._connected = false
     this._connectPromise = null
     this._connectTimer = null
     this._reconnectTimer = null
   }
 
-  connect (service) {
+  connect () {
     return new P((resolve, reject) => {
       if (this._connected) {
         return resolve(this)
       }
 
-      this._service = service
       this._connectPromise = { resolve, reject }
 
       this._connectTimer = setTimeout(this._connectTimedOut.bind(this), this._connectTimeout)
