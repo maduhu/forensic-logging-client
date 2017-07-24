@@ -280,8 +280,11 @@ Test('SidecarClient', sidecarClientTest => {
   })
 
   sidecarClientTest.test('receiving socket close event should', closeEventTest => {
-    closeEventTest.test('log close details and mark disconnected', test => {
+    closeEventTest.test('log close details, mark disconnected and emit close event', test => {
+      let closeSpy = sandbox.spy()
+
       let client = SidecarClient.create()
+      client.on('close', closeSpy)
 
       let socketEmitter = new EventEmitter()
       socketEmitter.connect = sandbox.stub()
@@ -297,6 +300,7 @@ Test('SidecarClient', sidecarClientTest => {
           let hadError = true
           socketEmitter.emit('close', hadError)
           test.notOk(client._connected)
+          test.ok(closeSpy.calledOnce)
           test.ok(Logger.info.calledWith(`Sidecar socket connection closed: ${hadError}`))
           test.end()
         })
@@ -306,8 +310,11 @@ Test('SidecarClient', sidecarClientTest => {
   })
 
   sidecarClientTest.test('receiving socket error event should', errorEventTest => {
-    errorEventTest.test('log error and mark disconnected', test => {
+    errorEventTest.test('log error, mark disconnected and emit close event', test => {
+      let closeSpy = sandbox.spy()
+
       let client = SidecarClient.create()
+      client.on('close', closeSpy)
 
       let socketEmitter = new EventEmitter()
       socketEmitter.connect = sandbox.stub()
@@ -323,6 +330,7 @@ Test('SidecarClient', sidecarClientTest => {
           let err = new Error()
           socketEmitter.emit('error', err)
           test.notOk(client._connected)
+          test.ok(closeSpy.calledOnce)
           test.ok(Logger.error.calledWith('Error on sidecar socket connection', err))
           test.end()
         })

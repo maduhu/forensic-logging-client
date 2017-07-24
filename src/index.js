@@ -1,11 +1,14 @@
 'use strict'
 
 const Net = require('net')
+const EventEmitter = require('events')
 const P = require('bluebird')
 const Logger = require('@leveloneproject/central-services-shared').Logger
 
-class Sidecar {
+class Sidecar extends EventEmitter {
   constructor (settings) {
+    super()
+
     this._host = settings.host || 'localhost'
     this._port = settings.port || 5678
     this._connectTimeout = settings.connectTimeout || 30000
@@ -115,11 +118,13 @@ class Sidecar {
   _socketOnError (err) {
     Logger.error('Error on sidecar socket connection', err)
     this._connected = false
+    this.emit('close')
   }
 
   _socketOnClose (hadError) {
     Logger.info(`Sidecar socket connection closed: ${hadError}`)
     this._connected = false
+    this.emit('close')
   }
 }
 
