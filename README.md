@@ -1,32 +1,57 @@
 # forensic-logging-client
-Client to connect to the forensic-logging-sidecar
+A client library used to connect to the forensic-logging-client
+
+## Installation
+You must have setup connection to the @leveloneproject npm repo on JFrog in order to install.
+`npm install @leveloneproject/forensic-logging-sidecar`
 
 ## Usage
-To use the forensic logging client, you only need to require it in the file you want to use the sidecar in:
+To use the forensic logging client, you only need to require it in the file you want to use the sidecar in, then call the relevant methods.:
 
 ```
+'use strict'
+
 const Client = require('@leveloneproject/forensic-logging-client')
-```
 
-To initialize the sidecar client simplay call the `create` method with the relevant values.
+const sidecar = createClient()
 
-```
-const client = Client.create({
-        host: thehost,
-        port: 5678,
-        connectTimeout: 3000,
-        reconnectInterval: 5000
+function createClient () {
+  return Client.create({
+    host: localhost,
+    port: 5678,
+    connectTimeout: 30000,
+    reconnectInterval: 5000
   })
-  ```
+}
 
-Once the client has been created, you need to make a call to `connect` to it.
+exports.connect = () => {
+  return sidecar.connect()
+}
 
-```
-client.connect()
+exports.write = (msg) => {
+  return sidecar.write(msg)
+}
 ```
 
-After the client has been connected, you can `write` to it at will.
+## API
 
-```
-client.write('the message')
-```
+### create(settings)
+Creates a new sidecar client.
+
+- `settings` {Object}
+  - `host` {String} The hostname or IP address of the Sidecar Client server. Defaults to 'localhost'.
+  - `port` {Number} The port for the Sidecar. Defaults to 5678.
+  - `connectTimeout` {Number} The time, in milliseconds, to timeout a connection attempt to the Sidecar. Defaults to 30000.
+  - `reconnectInterval` {Number} The time, in milliseconds, between connection attempts to the Sidecar. Defaults to 5000.
+  
+### sidecarClient.connect()
+Connects to the sidecar.
+
+This method will throw a `Unable to connect to sidecar within 30000ms` error if it can't connect to the sidecar.
+
+### sidecarClient.write(message)
+Writes a message to the sidecar.
+
+- `message` {String} The message to send to the Sidecar.
+
+This method will throw a `Sidecar is not connected` error if the sidecar has yet to be connected to.
